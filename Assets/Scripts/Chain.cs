@@ -15,6 +15,7 @@ public class Chain : MonoBehaviour
 
 	void Start()
 	{
+		var color = new Color(Random.Range(0.5f, 1f), Random.Range(0.5f, 1f), Random.Range(0.5f, 1f));
 		ForEachLink(link => {
 			if (link.name == "ChainLink0") {
 				ForEachUnconnectedJoint(link, (joint => {
@@ -26,6 +27,7 @@ public class Chain : MonoBehaviour
 					joint.connectedBody = toObject.GetComponent<Rigidbody>();
 				}));
 			}
+			link.GetComponent<Renderer>().material.color = color;
 		});
 	}
 
@@ -34,29 +36,53 @@ public class Chain : MonoBehaviour
 		UpdateLinks();
 	}
 
-	void UpdateLinks()
+	int LinkCount() {
+		return transform.childCount;
+	}
+
+	float CalculateChainLength()
 	{
-		int linkCount = 0;
 		float chainLength = 0;
-		ForEachLink(link => {
-			ForEachConnectedJoint(link, (joint => {
+		ForEachLink(link =>  {
+			ForEachConnectedJoint(link, (joint =>  {
 				chainLength += JointLength(joint);
 			}));
-			linkCount++;
 		});
-		if (linkCount > 0) {
-			float averageLinkLength = chainLength / linkCount;
-			if (averageLinkLength > maxLinkLength && !addingNewLink) {
-				Debug.Log("average link length for " + name + ": " + averageLinkLength);
-				addingNewLink = true;
-				CreateNewLink();
-				ForEachLink(link => {
-					ForEachConnectedJoint(link, joint => {
-						Debug.Log("link " + link.name + " joint connected object: " + joint.connectedBody.gameObject.name);
-					});
-				});
-				Invoke("TimeoutLinkAdd", linkAddTimeout);
-			}
+		return chainLength;
+	}
+
+	float AverageLinkLength()
+	{
+		return CalculateChainLength() / LinkCount();
+	}
+
+	void DebugLinkConnections()
+	{
+		ForEachLink(link =>  {
+			ForEachConnectedJoint(link, joint =>  {
+				Debug.Log("link " + link.name + " joint connected object: " + joint.connectedBody.gameObject.name);
+			});
+		});
+	}
+
+	bool ShouldAddNewLink()
+	{
+		return LinkCount() > 0 && (AverageLinkLength() > maxLinkLength && !addingNewLink);
+	}
+
+	void AddNewLink()
+	{
+		Debug.Log("average link length for " + name + ": " + AverageLinkLength());
+		addingNewLink = true;
+		DoNewLinkCreation();
+		DebugLinkConnections();
+		Invoke("TimeoutLinkAdd", linkAddTimeout);
+	}
+
+	void UpdateLinks()
+	{
+		if (ShouldAddNewLink()) {
+			AddNewLink();
 		}
 	}
 
@@ -65,13 +91,8 @@ public class Chain : MonoBehaviour
 		addingNewLink = false;
 	}
 
-	void CreateNewLink()
+	void ConnectUpNewLink(GameObject beforeLink, GameObject afterLink, GameObject newLink)
 	{
-		var newIndex = transform.childCount - 1;
-		var beforeLink = transform.FindChild("ChainLink" + (newIndex - 1)).gameObject;
-		var afterLink = transform.FindChild("ChainLinkN").gameObject;
-		var newLink = Instantiate(beforeLink);
-		newLink.name = "ChainLink" + newIndex;
 		ForEachConnectedJoint(newLink, joint =>  {
 			joint.connectedBody = beforeLink.GetComponent<Rigidbody>();
 		});
@@ -80,6 +101,22 @@ public class Chain : MonoBehaviour
 				joint.connectedBody = newLink.GetComponent<Rigidbody>();
 			}
 		});
+	}
+
+	static GameObject CreateUnlinkedLink(int newIndex, GameObject beforeLink)
+	{
+		var newLink = Instantiate(beforeLink);
+		newLink.name = "ChainLink" + newIndex;
+		return newLink;
+	}
+
+	void DoNewLinkCreation()
+	{
+		var newIndex = transform.childCount - 1;
+		var beforeLink = transform.FindChild("ChainLink" + (newIndex - 1)).gameObject;
+		var afterLink = transform.FindChild("ChainLinkN").gameObject;
+		var newLink = CreateUnlinkedLink(newIndex, beforeLink);
+		ConnectUpNewLink(beforeLink, afterLink, newLink);
 		newLink.transform.parent = gameObject.transform;
 	}
 
