@@ -66,16 +66,16 @@ public class Chain : MonoBehaviour
 
 	void CreateNewLink()
 	{
-		var firstLink = transform.GetChild(0).gameObject;
-		var secondLink = transform.GetChild(1).gameObject;
-		var newLink = Instantiate(firstLink);
 		var newIndex = transform.childCount - 1;
+		var beforeLink = transform.FindChild("ChainLink" + (newIndex - 1)).gameObject;
+		var afterLink = transform.FindChild("ChainLinkN").gameObject;
+		var newLink = Instantiate(beforeLink);
 		newLink.name = "ChainLink" + newIndex;
 		ForEachConnectedJoint(newLink, joint =>  {
-			joint.connectedBody = firstLink.GetComponent<Rigidbody>();
+			joint.connectedBody = beforeLink.GetComponent<Rigidbody>();
 		});
-		ForEachConnectedJoint(secondLink, joint =>  {
-			if (joint.connectedBody.gameObject != toObject) {
+		ForEachConnectedJoint(afterLink, joint =>  {
+			if (joint.connectedBody.gameObject.name.StartsWith("ChainLink")) {
 				joint.connectedBody = newLink.GetComponent<Rigidbody>();
 			}
 		});
