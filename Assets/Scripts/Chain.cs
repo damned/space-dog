@@ -1,39 +1,121 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Chain : MonoBehaviour {
+public class Chain : MonoBehaviour
+{
 
-	void Start () {
-		CountLinks ();	
-	}
-	
-	void Update () {
+	public GameObject fromObject;
+
+	public GameObject toObject;
+
+	public float maxLinkLength = 3f;
+
+	private bool addingNewLink = false;
+
+	void Start()
+	{
+		ForEachLink(link => {
+			if (link.name == "ChainLink0") {
+				ForEachUnconnectedJoint(link, (joint => {
+					joint.connectedBody = fromObject.GetComponent<Rigidbody>();
+				}));
+			}
+			else if (link.name == "ChainLinkN") {
+				ForEachUnconnectedJoint(link, (joint => {
+					joint.connectedBody = toObject.GetComponent<Rigidbody>();
+				}));
+			}
+		});
 	}
 
-	void CountLinks ()
+	void Update()
+	{
+		UpdateLinks();
+	}
+
+	void UpdateLinks()
 	{
 		int linkCount = 0;
-		foreach (Transform linkTransform in transform) {
-			GameObject link = linkTransform.gameObject;
+		float chainLength = 0;
+		ForEachLink(link => {
+			ForEachConnectedJoint(link, (joint => {
+				chainLength += JointLength(joint);
+			}));
 			linkCount++;
-			DebugLinkLengths (link);
+		});
+		if (linkCount > 0) {
+			float averageLinkLength = chainLength / linkCount;
+			if (averageLinkLength > maxLinkLength && !addingNewLink) {
+				Debug.Log("average link length for " + name + ": " + averageLinkLength);
+				addingNewLink = true;
+				CreateNewLink();
+				ForEachLink(link => {
+					ForEachConnectedJoint(link, joint => {
+						Debug.Log("link " + link.name + " joint connected object: " + joint.connectedBody.gameObject.name);
+					});
+				});
+				Invoke("TimeoutLinkAdd", 5);
+			}
 		}
-		Debug.Log ("link count: " + linkCount);
 	}
 
-	void DebugLinkLengths (GameObject link)
+	void TimeoutLinkAdd()
 	{
-		var joints = link.GetComponents<SpringJoint> ();
-		foreach (SpringJoint joint in joints) {
-			
-			var otherEnd = joint.connectedBody;
-			if (otherEnd == null) {
-				Debug.Log ("joint not connected");
+		addingNewLink = false;
+	}
+
+	void CreateNewLink()
+	{
+		var firstLink = transform.GetChild(0).gameObject;
+		var secondLink = transform.GetChild(1).gameObject;
+		var newLink = Instantiate(firstLink);
+		var newIndex = transform.childCount - 1;
+		newLink.name = "ChainLink" + newIndex;
+		ForEachConnectedJoint(newLink, joint =>  {
+			joint.connectedBody = firstLink.GetComponent<Rigidbody>();
+		});
+		ForEachConnectedJoint(secondLink, joint =>  {
+			if (joint.connectedBody.gameObject != toObject) {
+				joint.connectedBody = newLink.GetComponent<Rigidbody>();
 			}
-			else {
-				float length = Vector3.Distance (joint.transform.position, otherEnd.transform.position);
-				Debug.Log ("link length: " + length);
+		});
+		newLink.transform.parent = gameObject.transform;
+	}
+
+	private delegate void LinkHandler(GameObject link);
+
+	private delegate void JointHandler(SpringJoint joint);
+
+	private void ForEachLink(LinkHandler linkHandler)
+	{
+		foreach (Transform linkTransform in transform) {
+			GameObject link = linkTransform.gameObject;
+			linkHandler(link);
+		}
+	}
+
+	private void ForEachConnectedJoint(GameObject link, JointHandler jointHandler)
+	{
+		ForEachJoint(link, jointHandler, joint => {});
+	}
+	private void ForEachUnconnectedJoint(GameObject link, JointHandler jointHandler)
+	{
+		ForEachJoint(link, joint => {}, jointHandler);
+	}
+	private void ForEachJoint(GameObject link, JointHandler connectedJointHandler, JointHandler unconnectedJointHandler)
+	{
+		var joints = link.GetComponents<SpringJoint>();
+		foreach (SpringJoint joint in joints) {
+			if (joint.connectedBody == null) {
+				unconnectedJointHandler(joint);
+			} else {
+				connectedJointHandler(joint);
 			}
 		}
+	}
+
+	static float JointLength(SpringJoint joint)
+	{
+		return Vector3.Distance(joint.transform.position, joint.connectedBody.transform.position);
 	}
 }
