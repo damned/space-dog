@@ -9,7 +9,7 @@ public class Chain : MonoBehaviour
 	public GameObject toObject;
 
 	public float maxLinkLength = 3f;
-	public float linkAddTimeout = 1f;
+	public float linkAddTimeout = 0.2f;
 
 	private bool addingNewLink = false;
 
