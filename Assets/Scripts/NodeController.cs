@@ -6,7 +6,7 @@ using System.Collections.Generic;
 public class NodeController : MonoBehaviour {
 
 	private List<Collider> repulsives = new List<Collider>();
-	private List<string> repulsiveTags = new List<string>() { "Thing" };
+	private List<string> repulsiveTags = new List<string>() { "Wall", "Thing" };
 
 	public float strengthFactor = 1f;
 	public float maxStrength = 9f;
@@ -20,6 +20,9 @@ public class NodeController : MonoBehaviour {
 			Vector3 repulsiveVector = repulsive.transform.position - transform.position;
 			float distance = Vector3.Distance(transform.position, repulsive.transform.position);
 			float strength = Mathf.Max(0f, maxStrength - distance * strengthFactor);
+			if (repulsive.tag == "Wall") {
+				strength *= 2;
+			}
 			Rigidbody rd = transform.GetComponent<Rigidbody>();
 			rd.AddForce (repulsiveVector * -strength, ForceMode.Force);
 		});
