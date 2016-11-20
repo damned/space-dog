@@ -9,6 +9,7 @@ public class Chain : MonoBehaviour
 	public GameObject toObject;
 
 	public float maxLinkLength = 3f;
+	public float linkAddTimeout = 1f;
 
 	private bool addingNewLink = false;
 
@@ -54,7 +55,7 @@ public class Chain : MonoBehaviour
 						Debug.Log("link " + link.name + " joint connected object: " + joint.connectedBody.gameObject.name);
 					});
 				});
-				Invoke("TimeoutLinkAdd", 5);
+				Invoke("TimeoutLinkAdd", linkAddTimeout);
 			}
 		}
 	}
