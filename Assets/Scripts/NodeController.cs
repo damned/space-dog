@@ -6,6 +6,7 @@ using System.Collections.Generic;
 public class NodeController : MonoBehaviour {
 
 	private List<Collider> repulsives = new List<Collider>();
+	private List<string> repulsiveTags = new List<string>() { "Thing" };
 
 	public void Start() {
 		Debug.Log ("started");
@@ -24,7 +25,7 @@ public class NodeController : MonoBehaviour {
 	void OnTriggerEnter(Collider other) 
 	{
 		Debug.Log ("entered! " + other.tag);
-		if (other.tag == "Node") {
+		if (repulsiveTags.Contains(other.tag)) {
 			if (!repulsives.Contains (other)) {
 				repulsives.Add (other);
 			}
@@ -33,7 +34,7 @@ public class NodeController : MonoBehaviour {
 	void OnTriggerExit(Collider other) 
 	{
 		Debug.Log ("exited! " + other.tag);
-		if (other.tag == "Node") {
+		if (repulsiveTags.Contains(other.tag)) {
 			if (repulsives.Contains(other)) {
 				repulsives.Remove(other);
 			}
