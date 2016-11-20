@@ -3,9 +3,7 @@ using System.Collections;
 
 public class Chain : MonoBehaviour
 {
-
 	public GameObject fromObject;
-
 	public GameObject toObject;
 
 	public float maxLinkLength = 3f;
@@ -15,20 +13,12 @@ public class Chain : MonoBehaviour
 
 	void Start()
 	{
-		var color = new Color(Random.Range(0.5f, 1f), Random.Range(0.5f, 1f), Random.Range(0.5f, 1f));
+		var chainColor = RandomLightColor();
 		ForEachLink(link => {
-			if (link.name == "ChainLink0") {
-				ForEachUnconnectedJoint(link, (joint => {
-					joint.connectedBody = fromObject.GetComponent<Rigidbody>();
-				}));
-			}
-			else if (link.name == "ChainLinkN") {
-				ForEachUnconnectedJoint(link, (joint => {
-					joint.connectedBody = toObject.GetComponent<Rigidbody>();
-				}));
-			}
-			link.GetComponent<Renderer>().material.color = color;
+			link.GetComponent<Renderer>().material.color = chainColor;
 		});
+		ConnectLinkToTarget("ChainLink0", fromObject);
+		ConnectLinkToTarget("ChainLinkN", toObject);
 	}
 
 	void Update()
@@ -36,41 +26,19 @@ public class Chain : MonoBehaviour
 		UpdateLinks();
 	}
 
-	int LinkCount() {
-		return transform.childCount;
-	}
-
-	float CalculateChainLength()
+	private void UpdateLinks()
 	{
-		float chainLength = 0;
-		ForEachLink(link =>  {
-			ForEachConnectedJoint(link, (joint =>  {
-				chainLength += JointLength(joint);
-			}));
-		});
-		return chainLength;
+		if (ShouldAddNewLink()) {
+			AddNewLink();
+		}
 	}
 
-	float AverageLinkLength()
-	{
-		return CalculateChainLength() / LinkCount();
-	}
-
-	void DebugLinkConnections()
-	{
-		ForEachLink(link =>  {
-			ForEachConnectedJoint(link, joint =>  {
-				Debug.Log("link " + link.name + " joint connected object: " + joint.connectedBody.gameObject.name);
-			});
-		});
-	}
-
-	bool ShouldAddNewLink()
+	private bool ShouldAddNewLink()
 	{
 		return LinkCount() > 0 && (AverageLinkLength() > maxLinkLength && !addingNewLink);
 	}
 
-	void AddNewLink()
+	private void AddNewLink()
 	{
 		Debug.Log("average link length for " + name + ": " + AverageLinkLength());
 		addingNewLink = true;
@@ -79,19 +47,22 @@ public class Chain : MonoBehaviour
 		Invoke("TimeoutLinkAdd", linkAddTimeout);
 	}
 
-	void UpdateLinks()
+	private void DoNewLinkCreation()
 	{
-		if (ShouldAddNewLink()) {
-			AddNewLink();
-		}
+		var newIndex = transform.childCount - 1;
+		var beforeLink = transform.FindChild("ChainLink" + (newIndex - 1)).gameObject;
+		var afterLink = transform.FindChild("ChainLinkN").gameObject;
+		var newLink = CreateUnlinkedLink(newIndex, beforeLink);
+		ConnectUpNewLink(beforeLink, afterLink, newLink);
+		newLink.transform.parent = gameObject.transform;
 	}
 
-	void TimeoutLinkAdd()
+	private void TimeoutLinkAdd()
 	{
 		addingNewLink = false;
 	}
 
-	void ConnectUpNewLink(GameObject beforeLink, GameObject afterLink, GameObject newLink)
+	private void ConnectUpNewLink(GameObject beforeLink, GameObject afterLink, GameObject newLink)
 	{
 		ForEachConnectedJoint(newLink, joint =>  {
 			joint.connectedBody = beforeLink.GetComponent<Rigidbody>();
@@ -103,21 +74,22 @@ public class Chain : MonoBehaviour
 		});
 	}
 
-	static GameObject CreateUnlinkedLink(int newIndex, GameObject beforeLink)
+	private static GameObject CreateUnlinkedLink(int newIndex, GameObject beforeLink)
 	{
 		var newLink = Instantiate(beforeLink);
 		newLink.name = "ChainLink" + newIndex;
 		return newLink;
 	}
 
-	void DoNewLinkCreation()
+	private void ConnectLinkToTarget(string linkName, GameObject target)
 	{
-		var newIndex = transform.childCount - 1;
-		var beforeLink = transform.FindChild("ChainLink" + (newIndex - 1)).gameObject;
-		var afterLink = transform.FindChild("ChainLinkN").gameObject;
-		var newLink = CreateUnlinkedLink(newIndex, beforeLink);
-		ConnectUpNewLink(beforeLink, afterLink, newLink);
-		newLink.transform.parent = gameObject.transform;
+		ForEachLink(link =>  {
+			if (link.name == linkName) {
+				ForEachUnconnectedJoint(link, (joint =>  {
+					joint.connectedBody = target.GetComponent<Rigidbody>();
+				}));
+			}
+		});
 	}
 
 	private delegate void LinkHandler(GameObject link);
@@ -130,6 +102,11 @@ public class Chain : MonoBehaviour
 			GameObject link = linkTransform.gameObject;
 			linkHandler(link);
 		}
+	}
+
+	private static Color RandomLightColor()
+	{
+		return new Color(Random.Range(0.5f, 1f), Random.Range(0.5f, 1f), Random.Range(0.5f, 1f));
 	}
 
 	private void ForEachConnectedJoint(GameObject link, JointHandler jointHandler)
@@ -152,8 +129,37 @@ public class Chain : MonoBehaviour
 		}
 	}
 
-	static float JointLength(SpringJoint joint)
+	private static float JointLength(SpringJoint joint)
 	{
 		return Vector3.Distance(joint.transform.position, joint.connectedBody.transform.position);
+	}
+
+	private int LinkCount() {
+		return transform.childCount;
+	}
+
+	private float CalculateChainLength()
+	{
+		float chainLength = 0;
+		ForEachLink(link =>  {
+			ForEachConnectedJoint(link, (joint =>  {
+				chainLength += JointLength(joint);
+			}));
+		});
+		return chainLength;
+	}
+
+	private float AverageLinkLength()
+	{
+		return CalculateChainLength() / LinkCount();
+	}
+
+	private void DebugLinkConnections()
+	{
+		ForEachLink(link =>  {
+			ForEachConnectedJoint(link, joint =>  {
+				Debug.Log("link " + link.name + " joint connected object: " + joint.connectedBody.gameObject.name);
+			});
+		});
 	}
 }
