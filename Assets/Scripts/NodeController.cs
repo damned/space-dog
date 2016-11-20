@@ -8,23 +8,25 @@ public class NodeController : MonoBehaviour {
 	private List<Collider> repulsives = new List<Collider>();
 	private List<string> repulsiveTags = new List<string>() { "Thing" };
 
+	public float strengthFactor = 1f;
+	public float maxStrength = 9f;
+
 	public void Start() {
-		Debug.Log ("started");
 	}
 
 	void FixedUpdate()
 	{
 		repulsives.ForEach (repulsive => {
-			float strength = -5;
 			Vector3 repulsiveVector = repulsive.transform.position - transform.position;
+			float distance = Vector3.Distance(transform.position, repulsive.transform.position);
+			float strength = Mathf.Max(0f, maxStrength - distance * strengthFactor);
 			Rigidbody rd = transform.GetComponent<Rigidbody>();
-			rd.AddForce (repulsiveVector * strength, ForceMode.Force);
+			rd.AddForce (repulsiveVector * -strength, ForceMode.Force);
 		});
 	}
-
+		
 	void OnTriggerEnter(Collider other) 
 	{
-		Debug.Log ("entered! " + other.tag);
 		if (repulsiveTags.Contains(other.tag)) {
 			if (!repulsives.Contains (other)) {
 				repulsives.Add (other);
@@ -33,7 +35,6 @@ public class NodeController : MonoBehaviour {
 	}
 	void OnTriggerExit(Collider other) 
 	{
-		Debug.Log ("exited! " + other.tag);
 		if (repulsiveTags.Contains(other.tag)) {
 			if (repulsives.Contains(other)) {
 				repulsives.Remove(other);
