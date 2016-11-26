@@ -37,7 +37,6 @@ public class CameraController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
 		if (Input.GetKey(KeyCode.LeftControl)) {
 			ApplyKeyActions(mappingsWithControlKey);
 		}
@@ -45,18 +44,10 @@ public class CameraController : MonoBehaviour {
 		{
 			ApplyKeyActions(mappingsWithoutControlKey);
 		}
-
-		if(Input.GetKey(KeyCode.A))
-		{
-			Up();
-		}
-		if(Input.GetKey(KeyCode.Z))
-		{
-			Down();
-		}
+		ApplyKeyActions(mappingsWhenever);
 	}
 
-	static void ApplyKeyActions(IDictionary<KeyCode, Action> mappings)
+	static private void ApplyKeyActions(IDictionary<KeyCode, Action> mappings)
 	{
 		foreach (var mapping in mappings) {
 			if (Input.GetKey(mapping.Key)) {
@@ -65,47 +56,47 @@ public class CameraController : MonoBehaviour {
 		}
 	}
 
-	float Distance()
+	private float Distance()
 	{
 		return speed * Time.deltaTime;
 	}
 
-	float Angle()
+	private float Angle()
 	{
 		return angularSpeed * Time.deltaTime;
 	}
 
-	void Move(Vector3 unitVector)
+	private void Move(Vector3 unitVector)
 	{
 		transform.Translate(unitVector * Distance(), Space.World);
 	}
 
-	void RotateRightAround(Vector3 axis)
+	private void RotateRightAround(Vector3 axis)
 	{
 		transform.RotateAround(transform.position, axis, Angle());
 	}
 
-	void Up()
+	private void Up()
 	{
 		Move(transform.up);
 	}
 
-	void Down()
+	private void Down()
 	{
 		Move(transform.up * -1);
 	}
 
-	void Forward()
+	private void Forward()
 	{
 		Move(transform.forward);
 	}
 
-	void Back()
+	private void Back()
 	{
 		Move(transform.forward * -1);
 	}
 
-	void MoveLeft()
+	private void MoveLeft()
 	{
 		Move(transform.right * -1);
 	}

@@ -14,9 +14,7 @@ public class Chain : MonoBehaviour
 	void Start()
 	{
 		var chainColor = RandomLightColor();
-		ForEachLink(link => {
-			link.GetComponent<Renderer>().material.color = chainColor;
-		});
+		SetColor(chainColor);
 		ConnectLinkToTarget("ChainLink0", fromObject);
 		ConnectLinkToTarget("ChainLinkN", toObject);
 	}
@@ -24,6 +22,13 @@ public class Chain : MonoBehaviour
 	void Update()
 	{
 		UpdateLinks();
+	}
+
+	public void SetColor(Color color)
+	{
+		ForEachLink(link =>  {
+			link.GetComponent<Renderer>().material.color = color;
+		});
 	}
 
 	private void UpdateLinks()
@@ -40,7 +45,7 @@ public class Chain : MonoBehaviour
 
 	private void AddNewLink()
 	{
-		Debug.Log("average link length for " + name + ": " + AverageLinkLength());
+		//Debug.Log("average link length for " + name + ": " + AverageLinkLength());
 		addingNewLink = true;
 		DoNewLinkCreation();
 		DebugLinkConnections();
@@ -158,7 +163,7 @@ public class Chain : MonoBehaviour
 	{
 		ForEachLink(link =>  {
 			ForEachConnectedJoint(link, joint =>  {
-				Debug.Log("link " + link.name + " joint connected object: " + joint.connectedBody.gameObject.name);
+				//Debug.Log("link " + link.name + " joint connected object: " + joint.connectedBody.gameObject.name);
 			});
 		});
 	}
