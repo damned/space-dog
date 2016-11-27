@@ -10,6 +10,7 @@ public class NodeController : MonoBehaviour {
 
 	public float strengthFactor = 1f;
 	public float maxStrength = 9f;
+	public GameObject container;
 
 	public void Start() {
 	}
@@ -26,6 +27,12 @@ public class NodeController : MonoBehaviour {
 			Rigidbody rd = transform.GetComponent<Rigidbody>();
 			rd.AddForce (repulsiveVector * -strength, ForceMode.Force);
 		});
+
+		if (container != null) {
+			var link = GetComponent<LineRenderer>();
+			link.SetPosition(0, transform.position); 
+			link.SetPosition(1, container.transform.position); 
+		}
 	}
 		
 	void OnTriggerEnter(Collider other) 

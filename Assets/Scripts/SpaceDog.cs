@@ -8,6 +8,9 @@ public class SpaceDog : MonoBehaviour {
 
 	public GameObject thingPrefab;
 	public GameObject chainPrefab;
+	public GameObject containerPrefab;
+	public float containmentSpringForce = 30f;
+
 	private Color color = new Color(1f, 0.5f, 0.5f);
 	private IDictionary<string, GameObject> thingsById = new Dictionary<string, GameObject>();
 
@@ -16,6 +19,7 @@ public class SpaceDog : MonoBehaviour {
 	{
 		public string id;
 		public string label;
+		public string type;
 	}
 
 	[Serializable]
@@ -25,6 +29,7 @@ public class SpaceDog : MonoBehaviour {
 		public string label;
 		public string source;
 		public string target;
+		public string type;
 	}
 
 	public class Graph
@@ -38,17 +43,41 @@ public class SpaceDog : MonoBehaviour {
 	void Start () {
 		var graph = LoadGraphDefinition();
 		foreach (var node in graph.nodes) {
-			var thing = CreateWithColor(thingPrefab, color);
-			var labelParts = node.label.Split('_');
-			thing.GetComponentInChildren<TextMesh>().text = labelParts[labelParts.Length - 1];
-			UseGravity(thing, true);
+			GameObject thing;
+			if (node.type == "container") {
+				thing = CreateSomewhere(containerPrefab);
+				thing.GetComponentInChildren<TextMesh>().text = node.label;
+			}
+			else {
+				thing = CreateWithColor(thingPrefab, color);
+				var labelParts = node.label.Split('_');
+				thing.GetComponentInChildren<TextMesh>().text = labelParts[labelParts.Length - 1];
+				UseGravity(thing, true);
+			}
 			thingsById[node.id] = thing;
 		}
 		foreach (var edge in graph.edges) {
-			var chain = CreateChain();
-			chain.fromObject = thingsById[edge.source];
-			chain.toObject = thingsById[edge.target];
-			UseGravity(chain.fromObject, false);
+			if (edge.type == "containment") {
+				var container = thingsById[edge.source];
+				var containee = thingsById[edge.target];
+				var containerAttraction = containee.AddComponent<SpringJoint>();
+				containerAttraction.connectedBody = container.GetComponent<Rigidbody>();
+				containerAttraction.spring = containmentSpringForce;
+				var link = containee.AddComponent<LineRenderer>();
+				link.material = new Material(Shader.Find("Particles/Additive"));
+				link.SetVertexCount(2);
+				link.SetColors(color, color); 
+				link.SetPosition(0, container.transform.position); 
+				link.SetPosition(1, containee.transform.position);
+				containee.GetComponent<NodeController>().container = container;
+				link.SetWidth(1, 1); 
+			}
+			else {
+				var chain = CreateChain();
+				chain.fromObject = thingsById[edge.source];
+				chain.toObject = thingsById[edge.target];
+				UseGravity(chain.fromObject, false);
+			}
 		}
 	}
 
@@ -65,10 +94,15 @@ public class SpaceDog : MonoBehaviour {
 		return chain;
 	}
 
-	static private GameObject CreateWithColor(GameObject prefab, Color color)
+	static private GameObject CreateSomewhere(GameObject prefab)
 	{
 		Vector3 position = new Vector3(UnityEngine.Random.Range(-7.0f, 7.0f), 0, UnityEngine.Random.Range(-7.0f, 7.0f));
-		var created = Instantiate(prefab, position, Quaternion.identity) as GameObject;
+		return Instantiate(prefab, position, Quaternion.identity) as GameObject;
+	}
+
+	static private GameObject CreateWithColor(GameObject prefab, Color color)
+	{
+		var created = CreateSomewhere(prefab);
 		created.GetComponent<Renderer>().material.color = color;
 		return created;
 	}

@@ -153,6 +153,48 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 5
+--- !u!1001 &596339738
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 4000012160748776, guid: d8193da947af24f93b8f41f7a8cc4e06, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: -6.873459
+      objectReference: {fileID: 0}
+    - target: {fileID: 4000012160748776, guid: d8193da947af24f93b8f41f7a8cc4e06, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4000012160748776, guid: d8193da947af24f93b8f41f7a8cc4e06, type: 2}
+      propertyPath: m_LocalPosition.z
+      value: -1.263705
+      objectReference: {fileID: 0}
+    - target: {fileID: 4000012160748776, guid: d8193da947af24f93b8f41f7a8cc4e06, type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4000012160748776, guid: d8193da947af24f93b8f41f7a8cc4e06, type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4000012160748776, guid: d8193da947af24f93b8f41f7a8cc4e06, type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4000012160748776, guid: d8193da947af24f93b8f41f7a8cc4e06, type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4000012160748776, guid: d8193da947af24f93b8f41f7a8cc4e06, type: 2}
+      propertyPath: m_RootOrder
+      value: 6
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: d8193da947af24f93b8f41f7a8cc4e06, type: 2}
+  m_IsPrefabParent: 0
 --- !u!1 &803951017
 GameObject:
   m_ObjectHideFlags: 0
@@ -310,6 +352,9 @@ MonoBehaviour:
     type: 2}
   chainPrefab: {fileID: 1000010076437132, guid: 45664e825ffc2450d9606678810bf3a4,
     type: 2}
+  containerPrefab: {fileID: 1000011543380620, guid: d8193da947af24f93b8f41f7a8cc4e06,
+    type: 2}
+  containmentSpringForce: 30
 --- !u!4 &994743565
 Transform:
   m_ObjectHideFlags: 0
