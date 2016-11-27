@@ -9,7 +9,7 @@ public class SpaceDog : MonoBehaviour {
 	public GameObject thingPrefab;
 	public GameObject chainPrefab;
 	public GameObject containerPrefab;
-	public float containmentSpringForce = 30f;
+	public float containmentSpringForce = 3f;
 
 	private Color color = new Color(1f, 0.5f, 0.5f);
 	private IDictionary<string, GameObject> thingsById = new Dictionary<string, GameObject>();
@@ -32,15 +32,8 @@ public class SpaceDog : MonoBehaviour {
 		public string type;
 	}
 
-	public class Graph
+	void BuildGraph()
 	{
-		public List<Node> nodes;
-		public List<Edge> edges;
-	}
-
-
-	// Use this for initialization
-	void Start () {
 		var graph = LoadGraphDefinition();
 		foreach (var node in graph.nodes) {
 			GameObject thing;
@@ -60,17 +53,12 @@ public class SpaceDog : MonoBehaviour {
 			if (edge.type == "containment") {
 				var container = thingsById[edge.source];
 				var containee = thingsById[edge.target];
-				var containerAttraction = containee.AddComponent<SpringJoint>();
-				containerAttraction.connectedBody = container.GetComponent<Rigidbody>();
+				var containerAttraction = containee.GetComponent<SpringJoint>();
 				containerAttraction.spring = containmentSpringForce;
-				var link = containee.AddComponent<LineRenderer>();
-				link.material = new Material(Shader.Find("Particles/Additive"));
-				link.SetVertexCount(2);
-				link.SetColors(color, color); 
-				link.SetPosition(0, container.transform.position); 
-				link.SetPosition(1, containee.transform.position);
+				containerAttraction.connectedBody = container.GetComponent<Rigidbody>();
+				containerAttraction.anchor = new Vector3(0, 0, 0);
+				CreateContainmentLink(containee);
 				containee.GetComponent<NodeController>().container = container;
-				link.SetWidth(1, 1); 
 			}
 			else {
 				var chain = CreateChain();
@@ -81,9 +69,31 @@ public class SpaceDog : MonoBehaviour {
 		}
 	}
 
+	public class Graph
+	{
+		public List<Node> nodes;
+		public List<Edge> edges;
+	}
+
+
+	// Use this for initialization
+	void Start () {
+		BuildGraph();
+	}
+
 	// Update is called once per frame
 	void Update () {
 
+	}
+
+	void CreateContainmentLink(GameObject containee)
+	{
+		var link = containee.AddComponent<LineRenderer>();
+		link.material = new Material(Shader.Find("Particles/Additive"));
+		link.SetVertexCount(2);
+		link.SetColors(color, color);
+		link.SetWidth(1, 1);
+		link.enabled = false;
 	}
 
 	private Chain CreateChain()
