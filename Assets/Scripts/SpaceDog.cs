@@ -41,12 +41,14 @@ public class SpaceDog : MonoBehaviour {
 			var thing = CreateWithColor(thingPrefab, color);
 			var labelParts = node.label.Split('_');
 			thing.GetComponentInChildren<TextMesh>().text = labelParts[labelParts.Length - 1];
+			UseGravity(thing, true);
 			thingsById[node.id] = thing;
 		}
 		foreach (var edge in graph.edges) {
 			var chain = CreateChain();
 			chain.fromObject = thingsById[edge.source];
 			chain.toObject = thingsById[edge.target];
+			UseGravity(chain.fromObject, false);
 		}
 	}
 
@@ -80,6 +82,11 @@ public class SpaceDog : MonoBehaviour {
 			Debug.Log("got graph, nodes: " + graph.nodes.Count);
 		}
 		return graph;
+	}
+
+	static void UseGravity(GameObject thing, bool useGravity)
+	{
+		thing.GetComponent<Rigidbody>().useGravity = useGravity;
 	}
 
 }
