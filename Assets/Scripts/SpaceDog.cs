@@ -38,7 +38,10 @@ public class SpaceDog : MonoBehaviour {
 	void Start () {
 		var graph = LoadGraphDefinition();
 		foreach (var node in graph.nodes) {
-			thingsById[node.id] = CreateWithColor(thingPrefab, color);
+			var thing = CreateWithColor(thingPrefab, color);
+			var labelParts = node.label.Split('_');
+			thing.GetComponentInChildren<TextMesh>().text = labelParts[labelParts.Length - 1];
+			thingsById[node.id] = thing;
 		}
 		foreach (var edge in graph.edges) {
 			var chain = CreateChain();
