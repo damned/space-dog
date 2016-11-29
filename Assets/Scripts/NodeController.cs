@@ -33,6 +33,8 @@ public class NodeController : MonoBehaviour {
 			link.SetPosition(0, transform.position); 
 			link.SetPosition(1, container.transform.position); 
 		}
+
+		GetComponentInChildren<TextMesh>().transform.Rotate(transform.up);
 	}
 		
 	void OnTriggerEnter(Collider other) 
