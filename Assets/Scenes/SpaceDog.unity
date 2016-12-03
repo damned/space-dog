@@ -313,7 +313,7 @@ MonoBehaviour:
   containerPrefab: {fileID: 1000011543380620, guid: d8193da947af24f93b8f41f7a8cc4e06,
     type: 2}
   containmentSpringForce: 10
-  sigmaJsJsonFilename: /tmp/graph.json
+  sigmaJsJsonFilename: Assets/graph.json
 --- !u!4 &994743565
 Transform:
   m_ObjectHideFlags: 0
