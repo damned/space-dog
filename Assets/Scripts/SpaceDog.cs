@@ -10,6 +10,7 @@ public class SpaceDog : MonoBehaviour {
 	public GameObject chainPrefab;
 	public GameObject containerPrefab;
 	public float containmentSpringForce = 3f;
+	public string sigmaJsJsonFilename = "Assets/graph.json";
 
 	private Color color = new Color(1f, 0.5f, 0.5f);
 	private IDictionary<string, GameObject> thingsById = new Dictionary<string, GameObject>();
@@ -117,10 +118,10 @@ public class SpaceDog : MonoBehaviour {
 		return created;
 	}
 
-	static private Graph LoadGraphDefinition()
+	private Graph LoadGraphDefinition()
 	{
 		Graph graph;
-		using (StreamReader r = new StreamReader("/tmp/graph.json")) {
+		using (StreamReader r = new StreamReader(sigmaJsJsonFilename)) {
 			string json = r.ReadToEnd();
 			graph = JsonUtility.FromJson<Graph>(json);
 			Debug.Log("got graph, nodes: " + graph.nodes.Count);

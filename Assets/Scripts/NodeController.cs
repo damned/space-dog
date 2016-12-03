@@ -9,7 +9,7 @@ public class NodeController : MonoBehaviour {
 	private List<string> repulsiveTags = new List<string>() { "Wall", "Thing" };
 
 	public float strengthFactor = 1f;
-	public float maxStrength = 9f;
+	public float maxStrength = 5f;
 	public GameObject container;
 
 	public void Start() {
@@ -20,7 +20,7 @@ public class NodeController : MonoBehaviour {
 		repulsives.ForEach (repulsive => {
 			Vector3 repulsiveVector = repulsive.transform.position - transform.position;
 			float distance = Vector3.Distance(transform.position, repulsive.transform.position);
-			float strength = Mathf.Max(0f, maxStrength - distance * strengthFactor);
+			float strength = Mathf.Min(maxStrength, strengthFactor / distance);
 			if (repulsive.tag == "Wall") {
 				strength *= 2;
 			}
