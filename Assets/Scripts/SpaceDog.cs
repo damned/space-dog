@@ -59,7 +59,7 @@ public class SpaceDog : MonoBehaviour {
 				containerAttraction.connectedBody = container.GetComponent<Rigidbody>();
 				containerAttraction.anchor = new Vector3(0, 0, 0);
 				CreateContainmentLink(containee);
-				containee.GetComponent<NodeController>().container = container;
+				containee.GetComponent<ThingController>().container = container;
 			}
 			else {
 				var chain = CreateChain();

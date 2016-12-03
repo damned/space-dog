@@ -3,7 +3,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class NodeController : MonoBehaviour {
+public class ThingController : MonoBehaviour {
 
 	private List<Collider> repulsives = new List<Collider>();
 	private List<string> repulsiveTags = new List<string>() { "Wall", "Thing" };
