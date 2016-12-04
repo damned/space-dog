@@ -43,7 +43,6 @@ public class SigmaJsGraphFileLoader
 		using (StreamReader r = new StreamReader(filename)) {
 			string json = r.ReadToEnd();
 			graph = JsonUtility.FromJson<Graph>(json);
-			Debug.Log("got graph, nodes: " + graph.nodes.Count);
 		}
 		return graph;
 	}

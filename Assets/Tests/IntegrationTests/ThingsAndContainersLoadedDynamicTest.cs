@@ -44,6 +44,7 @@ public class ThingsAndContainersLoadedDynamicTest : MonoBehaviour
 
 		TestCorrectObjectsAreInstantiated();
 		TestNodesAreWiredTogetherWithChains();
+		TestContainersAreWiredToChildrenWithSprings();
 
 		IntegrationTest.Pass();
 	}
@@ -65,6 +66,16 @@ public class ThingsAndContainersLoadedDynamicTest : MonoBehaviour
 		AssertEqual(FindChainFrom(thing1).toObject, thing2);
 		AssertEqual(FindChainFrom(thing2).toObject, thing0);
 	}
+
+	void TestContainersAreWiredToChildrenWithSprings()
+	{
+		var container = containers[0]; 
+		var thing0 = FindThingObject("Thing 0"); 
+		var thing1 = FindThingObject("Thing 1"); 
+
+		AssertEqual(thing0.GetComponent<SpringJoint>().connectedBody, container.GetComponent<Rigidbody>());
+		AssertEqual(thing1.GetComponent<SpringJoint>().connectedBody, container.GetComponent<Rigidbody>());
+	}
 		
 	public void Update()
 	{
@@ -77,10 +88,7 @@ public class ThingsAndContainersLoadedDynamicTest : MonoBehaviour
 
 	static GameObject LoadPrefab(string prefab)
 	{
-		Debug.Log("loading prefab: " + prefab);
-		var loaded = Resources.Load<GameObject>("Prefabs/" + prefab);
-		Debug.Log("loaded prefab: " + loaded);
-		return loaded;
+		return Resources.Load<GameObject>("Prefabs/" + prefab);
 	}
 
 	private void AssertEqual(object actual, object expected)

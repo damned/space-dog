@@ -11,9 +11,6 @@ public class SpaceDog : MonoBehaviour {
 	public GameObject containerPrefab;
 	public float containmentSpringForce = 3f;
 	public string sigmaJsJsonFilename = "Assets/graph.json";
-	private Color color = new Color(1f, 0.5f, 0.5f);
-
-	private IDictionary<string, GameObject> thingsById = new Dictionary<string, GameObject>();
 
 	public void Start () {
 		BuildGraph();
@@ -22,10 +19,12 @@ public class SpaceDog : MonoBehaviour {
 	private void BuildGraph()
 	{
 		var loader = new SigmaJsGraphFileLoader(sigmaJsJsonFilename);
-		var builder = new SpaceDogBuilder(thingPrefab, chainPrefab, containerPrefab).WithContainmentSpringForce(containmentSpringForce);
 		var graph = loader.LoadGraphDefinition();
-		BuildNodes(builder, graph);
 
+		var builder = new SpaceDogBuilder(thingPrefab, chainPrefab, containerPrefab)
+			.WithContainmentSpringForce(containmentSpringForce);
+
+		BuildNodes(builder, graph);
 		BuildEdges(builder, graph);
 	}
 
