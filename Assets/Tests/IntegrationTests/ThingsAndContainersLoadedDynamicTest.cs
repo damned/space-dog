@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[IntegrationTest.DynamicTestAttribute("TestEntireGraph")]
+[IntegrationTest.DynamicTestAttribute("IntegrationTests")]
 [IntegrationTest.SucceedWithAssertions]
 [IntegrationTest.TimeoutAttribute(5)]
 [IntegrationTest.ExcludePlatformAttribute()]
