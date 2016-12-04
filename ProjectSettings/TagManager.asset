@@ -5,8 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - Thing
-  - New Tag
   - Wall
+  - Chain
+  - Container
   layers:
   - Default
   - TransparentFX

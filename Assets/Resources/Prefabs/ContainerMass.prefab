@@ -25,7 +25,7 @@ GameObject:
   - 54: {fileID: 54000011288934192}
   m_Layer: 0
   m_Name: ContainerMass
-  m_TagString: Untagged
+  m_TagString: Container
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
