@@ -2,24 +2,20 @@
   "nodes": [
     {
       "id": "n0",
-      "label": "A node",
-      "x": 0,
-      "y": 0,
-      "size": 3
+      "label": "Thing 0"
     },
     {
       "id": "n1",
-      "label": "Another node",
-      "x": 3,
-      "y": 1,
-      "size": 2
+      "label": "Thing 1"
     },
     {
       "id": "n2",
-      "label": "And a last one",
-      "x": 1,
-      "y": 3,
-      "size": 1
+      "label": "Thing 2"
+    },
+    {
+      "id": "c0",
+      "label": "Container 0",
+      "type": "container"
     }
   ],
   "edges": [
@@ -37,6 +33,18 @@
       "id": "e2",
       "source": "n2",
       "target": "n0"
+    },
+    {
+      "id": "ce0",
+      "type": "containment",
+      "source": "c0",
+      "target": "n0"
+    },
+    {
+      "id": "ce1",
+      "type": "containment",
+      "source": "c0",
+      "target": "n1"
     }
   ]
 }
